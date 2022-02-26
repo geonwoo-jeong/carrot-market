@@ -13,6 +13,7 @@ interface EnterForm {
 const Enter: NextPage = () => {
   const { register, watch, handleSubmit, reset } = useForm()
   const [method, setMethod] = useState<'email' | 'phone'>('email')
+  const [submitting, setSubmitting] = useState(false)
   const onEmailClick = () => {
     reset()
     setMethod('email')
@@ -21,7 +22,19 @@ const Enter: NextPage = () => {
     reset()
     setMethod('phone')
   }
-  const onValid = (data: EnterForm) => {}
+  const onValid = (data: EnterForm) => {
+    setSubmitting(true)
+    fetch('/api/users/enter', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(() => {
+      setSubmitting(false)
+    })
+  }
+
   return (
     <div className='mt-16 px-4'>
       <h3 className='text-3xl font-bold text-center'>Enter to Carrot</h3>
@@ -78,7 +91,7 @@ const Enter: NextPage = () => {
           ) : null}
           {method === 'email' ? <Button text={'Get login link'} /> : null}
           {method === 'phone' ? (
-            <Button text={'Get one-time password'} />
+            <Button text={submitting ? 'loading' : 'Get one-time password'} />
           ) : null}
         </form>
 
